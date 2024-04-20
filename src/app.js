@@ -2,6 +2,7 @@ const express = require('express');
 const cluster = require('cluster');
 const app = express();
 const port = 4000;
+const os = require('node:os');
 
 function delay(duration) {
     let startTime = Date.now();
@@ -21,10 +22,11 @@ app.get('/time', (req, res) => {
 
 if(cluster.isMaster) {
     console.log('Master has been startd....');
-    
-    //create Two worker process
-    cluster.fork();
-    cluster.fork();
+    const numCPUs  = os.cpus().length;
+    // create forks
+    for(let i = 0; i< numCPUs ; i++) {
+        cluster.fork();
+    }
 } else {
     console.log('Worker has been started.....');
 
